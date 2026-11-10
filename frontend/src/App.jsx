@@ -1,33 +1,84 @@
-import { useState, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import './App.css'
-
-const API_URL = 'http://localhost:8000'
+import GameBoard from './components/GameBoard.jsx'
+import Keyboard from './components/Keyboard.jsx'
+import NewGameForm from './components/NewGameForm.jsx'
+import { createGame, submitGuess } from './services/api.js'
 
 function App() {
-  const [message, setMessage] = useState('')
-  const [loading, setLoading] = useState(true)
+  const [game, setGame] = useState(null)
+  const [draft, setDraft] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const startGame = async (wordLength) => {
+    setLoading(true)
+    setError('')
+    setDraft('')
+    try {
+      setGame(await createGame(wordLength))
+    } catch (requestError) {
+      setError(requestError.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleKey = useCallback(async (key) => {
+    if (!game || game.status !== 'active' || loading) return
+    setError('')
+
+    if (key === 'Backspace') {
+      setDraft((current) => current.slice(0, -1))
+    } else if (key === 'Enter') {
+      if (draft.length !== game.word_length) {
+        setError(`Enter ${game.word_length} letters to submit a guess.`)
+        return
+      }
+      setLoading(true)
+      try {
+        setGame(await submitGuess(game.game_id, draft))
+        setDraft('')
+      } catch (requestError) {
+        setError(requestError.message)
+      } finally {
+        setLoading(false)
+      }
+    } else if (/^[a-z]$/i.test(key) && draft.length < game.word_length) {
+      setDraft((current) => current + key.toLowerCase())
+    }
+  }, [draft, game, loading])
 
   useEffect(() => {
-    fetch(`${API_URL}/`)
-      .then((response) => response.json())
-      .then((data) => {
-        setMessage(data.message)
-        setLoading(false)
-      })
-      .catch((error) => {
-        console.error('Error fetching from API:', error)
-        setMessage('Failed to connect to API')
-        setLoading(false)
-      })
-  }, [])
+    const onKeyDown = (event) => {
+      if (/^[a-z]$/i.test(event.key) || event.key === 'Enter' || event.key === 'Backspace') {
+        event.preventDefault()
+        handleKey(event.key)
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [handleKey])
 
   return (
-    <>
-      <h1>Wordle</h1>
-      <div className="card">
-        <p>API Response: {loading ? 'Loading...' : message}</p>
-      </div>
-    </>
+    <main className="app">
+      <header className="app-header">
+        <p className="eyebrow">A little word game</p>
+        <h1>Wordle</h1>
+        <p>Guess the hidden word. Green is right, yellow is misplaced.</p>
+      </header>
+      <NewGameForm onStart={startGame} disabled={loading} />
+      {error && <p className="message error" role="alert">{error}</p>}
+      {game && (
+        <>
+          <GameBoard game={game} draft={draft} />
+          <Keyboard onKey={handleKey} guesses={game.guesses} disabled={loading || game.status !== 'active'} />
+          <p aria-live="polite" className="message">
+            {loading ? 'Working…' : game.status === 'won' ? 'You got it!' : game.status === 'lost' ? `The word was ${game.answer}.` : `${game.guesses_remaining} guesses left`}
+          </p>
+        </>
+      )}
+    </main>
   )
 }
 

@@ -56,14 +56,22 @@ This repository includes boilerplate code to help you get started quickly.
 
 ```
 wordle-starter/
-├── frontend/           # React application (Vite)
-├── backend/            # FastAPI application
-│   ├── main.py
-│   ├── requirements.txt
-│   └── Dockerfile
+├── frontend/
+│   └── src/
+│       ├── components/ # Board, keyboard, and new-game form
+│       └── services/   # Backend API client
+├── backend/
+│   ├── data/           # Starter answer words
+│   ├── models/         # Game state
+│   ├── services/       # Game creation and guess scoring
+│   ├── tests/
+│   ├── main.py         # FastAPI routes and app setup
+│   └── requirements.txt
 ├── docker-compose.yml
 └── README.md
 ```
+
+The starter keeps games in memory, so they reset when the backend restarts. The answer list is intentionally small, and guesses are currently checked for length and letters rather than against a full dictionary.
 
 ### Frontend
 

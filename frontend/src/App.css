@@ -1,42 +1,25 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+#root { min-height: 100vh; }
+.app { width: min(100% - 32px, 480px); margin: 0 auto; padding: 32px 0; }
+.app-header { text-align: center; border-bottom: 1px solid #d3d6da; padding-bottom: 20px; }
+.app-header h1 { margin: 4px 0; font-size: 2rem; letter-spacing: .12em; }
+.app-header p { color: #666; margin: 8px 0; }
+.app-header .eyebrow { color: #538d4e; font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.new-game-form { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 20px 0; }
+.new-game-form select, .new-game-form button { border: 1px solid #d3d6da; border-radius: 5px; padding: 9px 12px; background: white; }
+.new-game-form button { color: white; background: #538d4e; border-color: #538d4e; cursor: pointer; font-weight: 700; }
+.new-game-form button:disabled, .keyboard button:disabled { opacity: .6; cursor: wait; }
+.board { display: grid; gap: 5px; justify-content: center; margin: 24px auto; }
+.board-row { display: flex; gap: 5px; }
+.tile { width: 52px; height: 52px; display: grid; place-items: center; border: 2px solid #d3d6da; background: white; font-size: 1.5rem; font-weight: 700; text-transform: uppercase; }
+.tile-correct, .key-correct { color: white; background: #538d4e !important; border-color: #538d4e !important; }
+.tile-present, .key-present { color: white; background: #b59f3b !important; border-color: #b59f3b !important; }
+.tile-absent, .key-absent { color: white; background: #787c7e !important; border-color: #787c7e !important; }
+.keyboard { display: grid; gap: 8px; margin: 24px auto 12px; }
+.keyboard-row { display: flex; justify-content: center; gap: 5px; }
+.keyboard button { min-width: 30px; height: 48px; padding: 0 8px; border: 0; border-radius: 4px; background: #d3d6da; font-weight: 700; text-transform: uppercase; cursor: pointer; }
+.message { min-height: 24px; text-align: center; font-weight: 600; }
+.message.error { color: #b42318; }
+@media (max-width: 380px) {
+  .tile { width: 42px; height: 42px; }
+  .keyboard button { min-width: 25px; padding: 0 5px; }
 }
